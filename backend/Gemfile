@@ -23,6 +23,8 @@ gem "thruster", require: false
 
 # Verifies the signed identity token issued by the company sign-in system
 gem "jwt", "~> 2.9"
+# json 3.x is not yet compatible with this Rails version
+gem "json", "~> 2.9"
 # Reads .xlsx files for the one-time Excel migration
 gem "roo", "~> 2.10"
 

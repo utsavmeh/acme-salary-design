@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_08_100003) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_100004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100003) do
     t.datetime "updated_at", null: false
     t.index ["employee_id", "effective_from"], name: "index_assignments_on_employee_id_and_effective_from", unique: true
     t.index ["employee_id"], name: "index_assignments_on_employee_id"
+  end
+
+  create_table "audit_events", force: :cascade do |t|
+    t.datetime "occurred_at", null: false
+    t.string "actor", null: false
+    t.string "action", null: false
+    t.string "target_type"
+    t.string "target_id"
+    t.jsonb "details", default: {}, null: false
+    t.string "prev_hash", limit: 64, null: false
+    t.string "event_hash", limit: 64, null: false
+    t.index ["actor", "occurred_at"], name: "index_audit_events_on_actor_and_occurred_at"
+    t.index ["event_hash"], name: "index_audit_events_on_event_hash", unique: true
+    t.index ["target_type", "target_id"], name: "index_audit_events_on_target_type_and_target_id"
   end
 
   create_table "deduction_lines", force: :cascade do |t|
