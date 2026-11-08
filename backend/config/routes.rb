@@ -5,6 +5,13 @@ Rails.application.routes.draw do
     get "me", to: "me#show"
     resources :exchange_rates, only: %i[index create]
     get "reports/:name", to: "reports#show"
+    resources :imports, only: %i[index create show] do
+      member do
+        get "rejected_rows(.:format)", to: "imports#rejected_rows", as: :rejected_rows
+        get :reconciliation
+        post :commit
+      end
+    end
     get "audit_events/verify", to: "audit_events#verify"
     get "audit_events", to: "audit_events#index"
 

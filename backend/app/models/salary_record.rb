@@ -4,6 +4,7 @@
 # new row with the same `effective_from` and a higher `version`; the highest version wins.
 class SalaryRecord < ApplicationRecord
   belongs_to :employee
+  belongs_to :import_batch, optional: true # set for rows loaded by the Excel migration
   has_many :deduction_lines, dependent: nil
 
   validates :currency, format: { with: /\A[A-Z]{3}\z/, message: "must be a 3-letter uppercase currency code" }

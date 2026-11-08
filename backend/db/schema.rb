@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_08_100005) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_100006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100005) do
     t.index ["currency", "year", "version"], name: "index_exchange_rates_on_currency_and_year_and_version", unique: true
   end
 
+  create_table "import_batches", force: :cascade do |t|
+    t.string "filename", null: false
+    t.string "file_sha256", limit: 64, null: false
+    t.string "uploaded_by", null: false
+    t.string "status", default: "staged", null: false
+    t.integer "total_rows", default: 0, null: false
+    t.integer "accepted_rows", default: 0, null: false
+    t.integer "rejected_rows", default: 0, null: false
+    t.string "committed_by"
+    t.datetime "committed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["file_sha256"], name: "index_import_batches_on_file_sha256", unique: true
+  end
+
+  create_table "import_rows", force: :cascade do |t|
+    t.bigint "import_batch_id", null: false
+    t.integer "row_number", null: false
+    t.string "status", null: false
+    t.jsonb "raw", default: {}, null: false
+    t.jsonb "data"
+    t.string "reasons", default: [], null: false, array: true
+    t.index ["import_batch_id", "row_number"], name: "index_import_rows_on_import_batch_id_and_row_number", unique: true
+    t.index ["import_batch_id"], name: "index_import_rows_on_import_batch_id"
+  end
+
   create_table "role_snapshots", force: :cascade do |t|
     t.string "email", null: false
     t.string "roles", default: [], null: false, array: true
@@ -90,11 +116,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100005) do
     t.string "created_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "import_batch_id"
     t.index ["employee_id", "effective_from", "version"], name: "idx_on_employee_id_effective_from_version_9bb800c71b", unique: true
     t.index ["employee_id"], name: "index_salary_records_on_employee_id"
+    t.index ["import_batch_id"], name: "index_salary_records_on_import_batch_id"
   end
 
   add_foreign_key "assignments", "employees"
   add_foreign_key "deduction_lines", "salary_records"
+  add_foreign_key "import_rows", "import_batches"
   add_foreign_key "salary_records", "employees"
+  add_foreign_key "salary_records", "import_batches"
 end
