@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_08_100002) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_100003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,6 +43,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100002) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["employee_number"], name: "index_employees_on_employee_number", unique: true
+  end
+
+  create_table "exchange_rates", force: :cascade do |t|
+    t.string "currency", limit: 3, null: false
+    t.integer "year", null: false
+    t.decimal "rate_to_usd", precision: 18, scale: 8, null: false
+    t.integer "version", null: false
+    t.string "reason", null: false
+    t.string "set_by", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["currency", "year", "version"], name: "index_exchange_rates_on_currency_and_year_and_version", unique: true
   end
 
   create_table "salary_records", force: :cascade do |t|
