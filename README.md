@@ -76,8 +76,8 @@ Prerequisites: Ruby 3.2.2, Node 22+, PostgreSQL running locally.
 ## Run the backend tests
 
 ```
-docker compose exec backend bundle exec rspec        # with Docker (needs RAILS_ENV=test db: see below)
-cd backend && bundle exec rspec                      # without Docker, local PostgreSQL
+docker compose exec -e RAILS_ENV=test backend bash -c "bin/rails db:create db:schema:load && bundle exec rspec"   # with Docker
+cd backend && bundle exec rspec                                                                                  # without Docker, local PostgreSQL
 ```
 The suite uses a real PostgreSQL database (the audit chain and the "current salary" queries rely on it), runs in a transaction per
 example, needs no network, and takes under 2 seconds. First time without Docker: `cd backend && RAILS_ENV=test bin/rails db:create db:schema:load`.
