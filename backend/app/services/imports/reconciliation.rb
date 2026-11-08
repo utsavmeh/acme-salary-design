@@ -57,7 +57,7 @@ module Imports
     # Amounts of rows that were actually loaded, by currency.
     def loaded
       @loaded ||= @batch.salary_records.group(:currency).pluck(:currency, Arel.sql("COUNT(*)"), Arel.sql("SUM(gross)"), Arel.sql("SUM(net)"))
-                        .to_h { |currency, count, gross, net| [currency, { rows: count, gross:, net: }] }
+                        .to_h { |currency, count, gross, net| [ currency, { rows: count, gross:, net: } ] }
     end
 
     def currency_of(row)

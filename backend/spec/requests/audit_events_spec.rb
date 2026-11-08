@@ -23,7 +23,7 @@ RSpec.describe "Audit events API" do
 
   it "filters by actor and action" do
     get "/api/audit_events", params: { actor: "HR@acme.test", action_name: "employee.viewed" }, headers: auditor_headers
-    expect(response.parsed_body["data"].map { |e| e["actor"] }).to eq(["hr@acme.test"])
+    expect(response.parsed_body["data"].map { |e| e["actor"] }).to eq([ "hr@acme.test" ])
   end
 
   it "records that the log was read" do

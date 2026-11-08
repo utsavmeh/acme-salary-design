@@ -17,7 +17,7 @@ module ImportHelpers
   # Writes the rows to a temp .csv file and returns its path.
   def csv_path(rows, headers: HEADERS)
     @csv_files ||= []
-    file = Tempfile.new(["import", ".csv"])
+    file = Tempfile.new([ "import", ".csv" ])
     file.write(CSV.generate { |csv| csv << headers; rows.each { |r| csv << headers.map { |h| r[h] } } })
     file.close
     @csv_files << file

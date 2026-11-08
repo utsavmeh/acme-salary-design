@@ -11,7 +11,7 @@ RSpec.describe Imports::RowValidator do
     expect(result.data).to include(
       employee_number: "E1", country: "IN", currency: "INR", base_pay: BigDecimal("1000"), net: BigDecimal("850"),
       hire_date: Date.new(2020, 1, 1), effective_from: Date.new(2024, 1, 1),
-      deductions: [{ label: "Income tax", amount: BigDecimal("150") }]
+      deductions: [ { label: "Income tax", amount: BigDecimal("150") } ]
     )
   end
 
@@ -25,7 +25,7 @@ RSpec.describe Imports::RowValidator do
 
   it "accepts several deductions" do
     result = validate("deductions" => "Income tax:100;Pension:50.50", "net" => "849.50")
-    expect(result.data[:deductions].map { |d| d[:label] }).to eq(["Income tax", "Pension"])
+    expect(result.data[:deductions].map { |d| d[:label] }).to eq([ "Income tax", "Pension" ])
   end
 
   it "accepts an explicit monthly frequency and rejects any other" do
@@ -43,7 +43,7 @@ RSpec.describe Imports::RowValidator do
   end
 
   it "rejects negative amounts, thousands separators and currency symbols" do
-    ["-5", "1,000", "$1000"].each { |bad| expect(reasons("base_pay" => bad)).to include(/base_pay must be a plain number/) }
+    [ "-5", "1,000", "$1000" ].each { |bad| expect(reasons("base_pay" => bad)).to include(/base_pay must be a plain number/) }
   end
 
   it "rejects ambiguous or impossible dates" do

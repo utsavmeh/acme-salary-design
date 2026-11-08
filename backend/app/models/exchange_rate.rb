@@ -3,7 +3,7 @@
 # Rates are never overwritten. A change is a new row with the next version, a reason and the
 # person who made it; the highest version is the one reports use.
 class ExchangeRate < ApplicationRecord
-  validates :currency, format: { with: /\A[A-Z]{3}\z/ }, exclusion: { in: ["USD"], message: "USD is always 1 and cannot be set" }
+  validates :currency, format: { with: /\A[A-Z]{3}\z/ }, exclusion: { in: [ "USD" ], message: "USD is always 1 and cannot be set" }
   validates :year, numericality: { only_integer: true, greater_than_or_equal_to: 1990, less_than_or_equal_to: 2200 }
   validates :rate_to_usd, numericality: { greater_than: 0 }
   validates :version, numericality: { only_integer: true, greater_than: 0 }

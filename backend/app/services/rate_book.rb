@@ -4,13 +4,13 @@
 # A missing rate gives nil: callers must report it, never guess or fall back to another year.
 class RateBook
   def initialize(rates = ExchangeRate.latest_versions)
-    @rates = rates.to_h { |r| [[r.currency, r.year], r.rate_to_usd] }
+    @rates = rates.to_h { |r| [ [ r.currency, r.year ], r.rate_to_usd ] }
   end
 
   def rate_for(currency, year)
     return BigDecimal("1") if currency == "USD"
 
-    @rates[[currency, year]]
+    @rates[[ currency, year ]]
   end
 
   # Unrounded USD value, or nil when the rate for that currency and year is missing.

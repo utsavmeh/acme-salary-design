@@ -6,7 +6,7 @@ class EmployeesController < ApplicationController
   def index
     search = EmployeeSearch.new(params.permit(*EmployeeSearch::FILTERS))
     scope = search.call
-    page = [params.fetch(:page, 1).to_i, 1].max
+    page = [ params.fetch(:page, 1).to_i, 1 ].max
     per_page = params.fetch(:per_page, 25).to_i.clamp(1, PER_PAGE_MAX)
     total = scope.count
     employees = scope.includes(:assignments).offset((page - 1) * per_page).limit(per_page).to_a
@@ -18,7 +18,7 @@ class EmployeesController < ApplicationController
   def show
     employee = Employee.includes(:assignments).find(params[:id])
     AuditLog.record(actor:, action: "employee.viewed", target: employee)
-    render json: EmployeePresenter.call(employee, current_salary: current_salaries_for([employee.id])[employee.id])
+    render json: EmployeePresenter.call(employee, current_salary: current_salaries_for([ employee.id ])[employee.id])
   end
 
   def create

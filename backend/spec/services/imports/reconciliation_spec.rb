@@ -50,7 +50,7 @@ RSpec.describe Imports::Reconciliation do
   end
 
   it "counts rows whose amounts cannot be read instead of hiding them" do
-    batch = stage([import_row("gross" => "abc", "base_pay" => "abc")])
+    batch = stage([ import_row("gross" => "abc", "base_pay" => "abc") ])
     expect(line(described_class.call(batch), "INR")[:unreadable_amount_rows]).to eq(1)
   end
 end

@@ -33,7 +33,7 @@ RSpec.describe Reports::Hikes do
     result = run
 
     expect(result[:rows].first).to include(percent_increase: "20.0", increase_usd: nil)
-    expect(result[:missing_rates]).to eq([{ currency: "INR", year: 2025, amounts_affected: 1 }])
+    expect(result[:missing_rates]).to eq([ { currency: "INR", year: 2025, amounts_affected: 1 } ])
   end
 
   it "can rank by absolute increase in USD instead" do

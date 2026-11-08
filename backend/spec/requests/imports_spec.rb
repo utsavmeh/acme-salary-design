@@ -2,7 +2,7 @@ require "rails_helper"
 require "csv"
 
 RSpec.describe "Imports API" do
-  let(:rows) { [import_row, import_row("employee_number" => "E2", "net" => "1", "name" => "=cmd|' /C calc'!A0")] }
+  let(:rows) { [ import_row, import_row("employee_number" => "E2", "net" => "1", "name" => "=cmd|' /C calc'!A0") ] }
 
   def upload(rows = self.rows, headers: hr_headers)
     post "/api/imports", params: { file: uploaded_csv(rows) }, headers: headers
@@ -68,7 +68,7 @@ RSpec.describe "Imports API" do
 
       get "/api/imports/#{id}/reconciliation", headers: hr_headers
       expect(response.parsed_body).to include("loaded_matches_accepted" => true)
-      expect(Employee.pluck(:employee_number)).to eq(["E1"])
+      expect(Employee.pluck(:employee_number)).to eq([ "E1" ])
     end
 
     it "refuses to commit while rejected rows are unconfirmed" do

@@ -17,10 +17,10 @@ module Imports
 
     def call
       table = case @extension
-              when ".csv" then csv_table
-              when ".xlsx" then xlsx_table
-              else raise AppErrors::BadRequest, "Only .csv and .xlsx files can be imported"
-              end
+      when ".csv" then csv_table
+      when ".xlsx" then xlsx_table
+      else raise AppErrors::BadRequest, "Only .csv and .xlsx files can be imported"
+      end
       header, *lines = table
       raise AppErrors::BadRequest, "The file is empty" if header.nil?
       raise AppErrors::BadRequest, "The file has more than #{MAX_ROWS} rows" if lines.size > MAX_ROWS

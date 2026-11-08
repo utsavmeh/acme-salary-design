@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe CsvSanitizer do
   it "prefixes text that a spreadsheet would run as a formula" do
-    ["=1+1", "+1", "-1", "@SUM(A1)", "\tcmd"].each do |text|
+    [ "=1+1", "+1", "-1", "@SUM(A1)", "\tcmd" ].each do |text|
       expect(described_class.call(text)).to start_with("'")
     end
   end

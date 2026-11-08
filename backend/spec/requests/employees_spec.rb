@@ -12,7 +12,7 @@ RSpec.describe "Employees API" do
     end
 
     it "answers 403 to a user with no salary role" do
-      get "/api/employees", headers: auth_headers(groups: ["some-other-group"])
+      get "/api/employees", headers: auth_headers(groups: [ "some-other-group" ])
       expect(response).to have_http_status(:forbidden)
     end
 
@@ -44,7 +44,7 @@ RSpec.describe "Employees API" do
 
     it "filters and paginates" do
       get "/api/employees", params: { country: "US", per_page: 1 }, headers: hr_headers
-      expect(response.parsed_body["data"].map { |e| e["name"] }).to eq(["Ben Smith"])
+      expect(response.parsed_body["data"].map { |e| e["name"] }).to eq([ "Ben Smith" ])
     end
 
     it "caps the page size" do

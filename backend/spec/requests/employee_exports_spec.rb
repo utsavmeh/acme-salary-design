@@ -24,7 +24,7 @@ RSpec.describe "GET /api/employees/export" do
   end
 
   it "applies the same filters as the search" do
-    expect(export(department: "Sales").map { |r| r["employee_number"] }).to eq(["E2"])
+    expect(export(department: "Sales").map { |r| r["employee_number"] }).to eq([ "E2" ])
   end
 
   it "neutralises formulas in text cells" do

@@ -45,12 +45,12 @@ RSpec.describe "Exchange rates API" do
       get "/api/exchange_rates", headers: hr_headers
 
       rows = response.parsed_body["data"]
-      expect(rows.map { |r| [r["currency"], r["version"]] }).to contain_exactly(["EUR", 1], ["INR", 2])
+      expect(rows.map { |r| [ r["currency"], r["version"] ] }).to contain_exactly([ "EUR", 1 ], [ "INR", 2 ])
     end
 
     it "returns the full history on request, filtered by currency" do
       get "/api/exchange_rates", params: { all_versions: "true", currency: "inr" }, headers: hr_headers
-      expect(response.parsed_body["data"].map { |r| r["version"] }).to eq([2, 1])
+      expect(response.parsed_body["data"].map { |r| r["version"] }).to eq([ 2, 1 ])
     end
 
     it "is not readable by auditors" do

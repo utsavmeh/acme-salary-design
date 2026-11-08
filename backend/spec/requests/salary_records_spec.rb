@@ -4,7 +4,7 @@ RSpec.describe "Salary records API" do
   let(:employee) { create(:employee) }
   let(:payload) do
     { salary_record: { currency: "INR", base_pay: "1000", gross: "1000", net: "850", effective_from: "2024-01-01",
-                       deductions: [{ label: "Income tax", amount: "150" }] } }
+                       deductions: [ { label: "Income tax", amount: "150" } ] } }
   end
 
   it "requires the hr role" do
@@ -18,7 +18,7 @@ RSpec.describe "Salary records API" do
 
       expect(response).to have_http_status(:created)
       expect(response.parsed_body).to include("currency" => "INR", "gross" => "1000.00", "net" => "850.00", "version" => 1)
-      expect(response.parsed_body["deductions"]).to eq([{ "label" => "Income tax", "amount" => "150.00" }])
+      expect(response.parsed_body["deductions"]).to eq([ { "label" => "Income tax", "amount" => "150.00" } ])
     end
 
     it "answers 422 when net does not match gross minus deductions" do
@@ -66,15 +66,15 @@ RSpec.describe "Salary records API" do
 
     def history(**params)
       get "/api/employees/#{employee.id}/salary_records", params:, headers: hr_headers
-      response.parsed_body["data"].map { |r| [r["effective_from"], r["version"]] }
+      response.parsed_body["data"].map { |r| [ r["effective_from"], r["version"] ] }
     end
 
     it "lists the current versions, newest first" do
-      expect(history).to eq([["2024-01-01", 2], ["2023-01-01", 1]])
+      expect(history).to eq([ [ "2024-01-01", 2 ], [ "2023-01-01", 1 ] ])
     end
 
     it "can include superseded versions" do
-      expect(history(all_versions: "true")).to eq([["2024-01-01", 2], ["2024-01-01", 1], ["2023-01-01", 1]])
+      expect(history(all_versions: "true")).to eq([ [ "2024-01-01", 2 ], [ "2024-01-01", 1 ], [ "2023-01-01", 1 ] ])
     end
 
     it "audits the view" do

@@ -2,20 +2,20 @@ require "rails_helper"
 
 RSpec.describe Imports::Parser do
   it "reads a CSV into rows numbered as in the file (header is line 1)" do
-    rows = described_class.call(csv_path([import_row, import_row("employee_number" => "E2")]), "x.csv")
+    rows = described_class.call(csv_path([ import_row, import_row("employee_number" => "E2") ]), "x.csv")
 
-    expect(rows.map(&:number)).to eq([2, 3])
+    expect(rows.map(&:number)).to eq([ 2, 3 ])
     expect(rows.first.values).to include("employee_number" => "E1", "base_pay" => "1000")
   end
 
   it "skips completely blank lines but keeps line numbers" do
-    path = csv_path([import_row, {}, import_row("employee_number" => "E3")])
-    expect(described_class.call(path, "x.csv").map(&:number)).to eq([2, 4])
+    path = csv_path([ import_row, {}, import_row("employee_number" => "E3") ])
+    expect(described_class.call(path, "x.csv").map(&:number)).to eq([ 2, 4 ])
   end
 
   it "normalises header names" do
-    path = csv_path([{ "Employee Number" => "E1" }], headers: ["Employee Number"])
-    expect(described_class.call(path, "x.csv").first.values.keys).to eq(["employee_number"])
+    path = csv_path([ { "Employee Number" => "E1" } ], headers: [ "Employee Number" ])
+    expect(described_class.call(path, "x.csv").first.values.keys).to eq([ "employee_number" ])
   end
 
   it "reads an Excel .xlsx file, including real Excel dates and numeric cells" do
@@ -26,14 +26,14 @@ RSpec.describe Imports::Parser do
   end
 
   it "refuses other file types" do
-    expect { described_class.call(csv_path([import_row]), "x.pdf") }.to raise_error(AppErrors::BadRequest, /Only .csv and .xlsx/)
+    expect { described_class.call(csv_path([ import_row ]), "x.pdf") }.to raise_error(AppErrors::BadRequest, /Only .csv and .xlsx/)
   end
 
   it "refuses an empty file and a broken .xlsx" do
-    empty = Tempfile.new(["empty", ".csv"]).tap(&:close)
+    empty = Tempfile.new([ "empty", ".csv" ]).tap(&:close)
     expect { described_class.call(empty.path, "e.csv") }.to raise_error(AppErrors::BadRequest, /empty/)
 
-    junk = Tempfile.new(["junk", ".xlsx"]).tap { |f| f.write("not a zip"); f.close }
+    junk = Tempfile.new([ "junk", ".xlsx" ]).tap { |f| f.write("not a zip"); f.close }
     expect { described_class.call(junk.path, "junk.xlsx") }.to raise_error(AppErrors::BadRequest)
   end
 end

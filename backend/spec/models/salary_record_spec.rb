@@ -70,8 +70,8 @@ RSpec.describe SalaryRecord do
       end
 
       it "returns the latest record on or before the date" do
-        expect(described_class.current_as_of(Date.new(2023, 6, 1)).map(&:base_pay)).to eq([900])
-        expect(described_class.current_as_of(Date.new(2024, 1, 1)).map(&:base_pay)).to eq([1000])
+        expect(described_class.current_as_of(Date.new(2023, 6, 1)).map(&:base_pay)).to eq([ 900 ])
+        expect(described_class.current_as_of(Date.new(2024, 1, 1)).map(&:base_pay)).to eq([ 1000 ])
       end
 
       it "returns nothing for an employee who has no record yet on that date" do

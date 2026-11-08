@@ -70,7 +70,7 @@ module Imports
       end
 
       def problems_for(row_number, data)
-        [name_problem(row_number, data), pay_problem(row_number, data)].compact
+        [ name_problem(row_number, data), pay_problem(row_number, data) ].compact
       end
 
       private
@@ -90,7 +90,7 @@ module Imports
       end
 
       def pay_problem(row_number, data)
-        key = [data[:employee_number], data[:effective_from]]
+        key = [ data[:employee_number], data[:effective_from] ]
         return "a salary for employee #{key[0]} starting #{key[1]} already exists in the system" if @existing_dates.include?(key)
 
         if (first = @first_row_for_pay[key])

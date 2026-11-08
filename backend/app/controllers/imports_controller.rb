@@ -55,8 +55,8 @@ class ImportsController < ApplicationController
   def rejected_csv(rows)
     columns = rows.flat_map { |r| r.raw.keys }.uniq
     CSV.generate do |csv|
-      csv << ["row_number", "reasons", *columns]
-      rows.each { |r| csv << [r.row_number, r.reasons.join(" | "), *columns.map { |c| CsvSanitizer.call(r.raw[c]) }] }
+      csv << [ "row_number", "reasons", *columns ]
+      rows.each { |r| csv << [ r.row_number, r.reasons.join(" | "), *columns.map { |c| CsvSanitizer.call(r.raw[c]) } ] }
     end
   end
 end

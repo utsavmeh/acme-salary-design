@@ -6,7 +6,7 @@ RSpec.describe SalaryRecordWriter do
   let(:employee) { create(:employee, country: "IN") }
   let(:attrs) do
     { currency: "INR", base_pay: "1000", gross: "1000", net: "850", effective_from: "2024-01-01",
-      deductions: [{ label: "Income tax", amount: "150" }] }
+      deductions: [ { label: "Income tax", amount: "150" } ] }
   end
 
   describe "#create" do
@@ -14,7 +14,7 @@ RSpec.describe SalaryRecordWriter do
       record = writer.create(employee, attrs)
 
       expect(record).to have_attributes(version: 1, country: "IN", created_by: "hr@acme.test", net: 850)
-      expect(record.deduction_lines.map(&:label)).to eq(["Income tax"])
+      expect(record.deduction_lines.map(&:label)).to eq([ "Income tax" ])
     end
 
     it "writes an audit event without copying pay amounts" do
@@ -50,7 +50,7 @@ RSpec.describe SalaryRecordWriter do
 
     it "keeps the previous deductions when none are given" do
       corrected = writer.correct(original, base_pay: "1100", gross: "1000", net: "850")
-      expect(corrected.deduction_lines.map { |l| [l.label, l.amount] }).to eq([["Income tax", 150]])
+      expect(corrected.deduction_lines.map { |l| [ l.label, l.amount ] }).to eq([ [ "Income tax", 150 ] ])
     end
 
     it "audits which fields changed, not their values" do

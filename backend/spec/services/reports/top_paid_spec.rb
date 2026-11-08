@@ -21,7 +21,7 @@ RSpec.describe Reports::TopPaid do
   end
 
   it "finds the highest paid in one department" do
-    expect(run(department: "Sales", limit: 1)[:rows].map { |r| r[:employee_number] }).to eq(["E3"])
+    expect(run(department: "Sales", limit: 1)[:rows].map { |r| r[:employee_number] }).to eq([ "E3" ])
   end
 
   it "respects the limit" do
@@ -38,7 +38,7 @@ RSpec.describe Reports::TopPaid do
     result = run
 
     expect(result[:rows].map { |r| r[:employee_number] }).not_to include("E4")
-    expect(result[:missing_rates]).to eq([{ currency: "JPY", year: 2025, amounts_affected: 1 }])
+    expect(result[:missing_rates]).to eq([ { currency: "JPY", year: 2025, amounts_affected: 1 } ])
   end
 
   it "ranks by plain amounts in native mode for one currency" do

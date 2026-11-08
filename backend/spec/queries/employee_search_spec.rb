@@ -16,26 +16,26 @@ RSpec.describe EmployeeSearch do
   def names(params) = described_class.new(params, today:).call.map(&:name)
 
   it "returns everyone ordered by name when there are no filters" do
-    expect(names({})).to eq(["Asha Rao", "Ben Smith", "Cara 100% Smith"])
+    expect(names({})).to eq([ "Asha Rao", "Ben Smith", "Cara 100% Smith" ])
   end
 
   it "matches text against name or employee number, ignoring case" do
-    expect(names(q: "asha")).to eq(["Asha Rao"])
-    expect(names(q: "e200")).to eq(["Ben Smith"])
+    expect(names(q: "asha")).to eq([ "Asha Rao" ])
+    expect(names(q: "e200")).to eq([ "Ben Smith" ])
   end
 
   it "treats % in the text as a literal character" do
-    expect(names(q: "100%")).to eq(["Cara 100% Smith"])
+    expect(names(q: "100%")).to eq([ "Cara 100% Smith" ])
   end
 
   it "filters by country and status" do
-    expect(names(country: "us")).to eq(["Ben Smith", "Cara 100% Smith"])
-    expect(names(country: "US", status: "inactive")).to eq(["Cara 100% Smith"])
+    expect(names(country: "us")).to eq([ "Ben Smith", "Cara 100% Smith" ])
+    expect(names(country: "US", status: "inactive")).to eq([ "Cara 100% Smith" ])
   end
 
   it "filters by the department held on the given day, not a future one" do
-    expect(names(department: "Engineering")).to eq(["Asha Rao"])
-    expect(names(department: "Sales")).to eq(["Ben Smith"])
+    expect(names(department: "Engineering")).to eq([ "Asha Rao" ])
+    expect(names(department: "Sales")).to eq([ "Ben Smith" ])
   end
 
   it "combines filters with AND" do

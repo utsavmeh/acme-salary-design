@@ -20,12 +20,12 @@ RSpec.describe Imports::Commit do
     expect(asha.assignments.order(:effective_from).pluck(:department)).to eq(%w[Engineering Sales])
     record = asha.salary_records.find_by!(effective_from: "2024-01-01")
     expect(record).to have_attributes(base_pay: 1000, net: 850, created_by: "hr@acme.test", import_batch: batch)
-    expect(record.deduction_lines.pluck(:label, :amount)).to eq([["Income tax", 150]])
+    expect(record.deduction_lines.pluck(:label, :amount)).to eq([ [ "Income tax", 150 ] ])
   end
 
   it "reuses an employee that already exists in the system" do
     existing = create(:employee, employee_number: "E1", name: "Asha Rao")
-    commit(stage([import_row]))
+    commit(stage([ import_row ]))
 
     expect(Employee.where(employee_number: "E1").count).to eq(1)
     expect(existing.salary_records.count).to eq(1)
@@ -37,19 +37,19 @@ RSpec.describe Imports::Commit do
     create(:salary_record, employee: create(:employee, employee_number: "E2", name: "Ben Smith"), effective_from: Date.new(2024, 1, 1))
 
     expect { commit(batch) }.to raise_error(AppErrors::Conflict, /Row 4.*Nothing was loaded/)
-    expect(Employee.pluck(:employee_number)).to eq(["E2"])
+    expect(Employee.pluck(:employee_number)).to eq([ "E2" ])
     expect(SalaryRecord.where(import_batch: batch)).to be_empty
     expect(batch.reload.status).to eq("staged")
   end
 
   it "cannot be committed twice" do
-    batch = commit(stage([import_row]))
+    batch = commit(stage([ import_row ]))
     expect { commit(batch) }.to raise_error(AppErrors::Conflict, /already committed/)
     expect(SalaryRecord.count).to eq(1)
   end
 
   context "when some rows were rejected" do
-    let(:batch) { stage([import_row, import_row("employee_number" => "E2", "net" => "1")]) }
+    let(:batch) { stage([ import_row, import_row("employee_number" => "E2", "net" => "1") ]) }
 
     it "asks for confirmation before loading only the good rows" do
       expect { commit(batch) }.to raise_error(AppErrors::BadRequest, /1 rows were rejected/)
@@ -58,12 +58,12 @@ RSpec.describe Imports::Commit do
 
     it "loads only the accepted rows once confirmed" do
       commit(batch, confirm_rejected: true)
-      expect(Employee.pluck(:employee_number)).to eq(["E1"])
+      expect(Employee.pluck(:employee_number)).to eq([ "E1" ])
     end
   end
 
   it "audits the commit" do
-    commit(stage([import_row]))
+    commit(stage([ import_row ]))
     expect(AuditEvent.find_by!(action: "import.committed").details).to include("loaded_rows" => 1)
   end
 end

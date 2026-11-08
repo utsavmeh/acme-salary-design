@@ -13,7 +13,7 @@ class AuditEventsController < ApplicationController
     scope = scope.where("occurred_at >= ?", Time.zone.parse(params[:from])) if params[:from].present?
     scope = scope.where("occurred_at <= ?", Time.zone.parse(params[:to])) if params[:to].present?
 
-    page = [params.fetch(:page, 1).to_i, 1].max
+    page = [ params.fetch(:page, 1).to_i, 1 ].max
     per_page = params.fetch(:per_page, 50).to_i.clamp(1, PER_PAGE_MAX)
     total = scope.count
     events = scope.offset((page - 1) * per_page).limit(per_page).to_a

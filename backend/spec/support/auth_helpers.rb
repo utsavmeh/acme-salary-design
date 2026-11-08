@@ -1,6 +1,6 @@
 # Builds the Authorization header the real sign-in system would send.
 module AuthHelpers
-  def token_for(email: "hr@acme.test", groups: ["salary-hr"], exp: 1.hour.from_now.to_i, secret: Rails.configuration.x.auth.jwt_secret)
+  def token_for(email: "hr@acme.test", groups: [ "salary-hr" ], exp: 1.hour.from_now.to_i, secret: Rails.configuration.x.auth.jwt_secret)
     JWT.encode({ email:, groups:, exp: }, secret, Auth::TokenVerifier::ALGORITHM)
   end
 
@@ -8,9 +8,9 @@ module AuthHelpers
     { "Authorization" => "Bearer #{token_for(**options)}" }
   end
 
-  def hr_headers = auth_headers(email: "hr@acme.test", groups: ["salary-hr"])
-  def rate_manager_headers = auth_headers(email: "rates@acme.test", groups: ["salary-rate-manager"])
-  def auditor_headers = auth_headers(email: "auditor@acme.test", groups: ["salary-auditor"])
+  def hr_headers = auth_headers(email: "hr@acme.test", groups: [ "salary-hr" ])
+  def rate_manager_headers = auth_headers(email: "rates@acme.test", groups: [ "salary-rate-manager" ])
+  def auditor_headers = auth_headers(email: "auditor@acme.test", groups: [ "salary-auditor" ])
 end
 
 RSpec.configure { |config| config.include AuthHelpers }

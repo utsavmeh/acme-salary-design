@@ -46,20 +46,20 @@ module Reports
           end
         end
       end
-      [hikes, skipped]
+      [ hikes, skipped ]
     end
 
     def rank_by_percent(hikes, year)
-      top = hikes.sort_by { |h| [-percent(h), h[:record].employee.employee_number] }.first(limit)
+      top = hikes.sort_by { |h| [ -percent(h), h[:record].employee.employee_number ] }.first(limit)
       top.each_with_index.map { |h, i| present(i + 1, h, year) }
     end
 
     def rank_by_amount(hikes, year)
       converted = hikes.filter_map do |h|
         usd = conversion.convert(increase(h), h[:record].currency, year)
-        [h, usd] if usd
+        [ h, usd ] if usd
       end
-      top = converted.sort_by { |h, usd| [-usd, h[:record].employee.employee_number] }.first(limit)
+      top = converted.sort_by { |h, usd| [ -usd, h[:record].employee.employee_number ] }.first(limit)
       top.each_with_index.map { |(h, usd), i| present(i + 1, h, year, usd:) }
     end
 

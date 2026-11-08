@@ -9,9 +9,9 @@ module Reports
 
       ranked = rows.filter_map do |row|
         amount = conversion.convert(row.record.base_pay, row.record.currency, as_of.year)
-        [row, amount] if amount
+        [ row, amount ] if amount
       end
-      top = ranked.sort_by { |row, amount| [-amount, row.employee.employee_number] }.first(limit)
+      top = ranked.sort_by { |row, amount| [ -amount, row.employee.employee_number ] }.first(limit)
 
       envelope(rows: top.each_with_index.map { |(row, amount), index| present(index + 1, row, amount) })
     end

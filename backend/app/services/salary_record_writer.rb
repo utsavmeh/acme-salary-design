@@ -71,7 +71,7 @@ class SalaryRecordWriter
 
   def changed_fields(old, new)
     fields = RECORD_FIELDS.select { |f| old[f] != new[f] }
-    fields << :deductions if old.deduction_lines.map { |l| [l.label, l.amount] } != new.deduction_lines.map { |l| [l.label, l.amount] }
+    fields << :deductions if old.deduction_lines.map { |l| [ l.label, l.amount ] } != new.deduction_lines.map { |l| [ l.label, l.amount ] }
     fields
   end
 end

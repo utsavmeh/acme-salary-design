@@ -19,7 +19,7 @@ RSpec.describe "GET /api/me" do
   end
 
   it "records a first-seen audit event, and an access change on the next visit" do
-    get "/api/me", headers: auth_headers(email: "jo@acme.test", groups: ["salary-hr"])
+    get "/api/me", headers: auth_headers(email: "jo@acme.test", groups: [ "salary-hr" ])
     get "/api/me", headers: auth_headers(email: "jo@acme.test", groups: %w[salary-hr salary-rate-manager])
 
     expect(AuditEvent.order(:id).pluck(:action)).to eq(%w[roles.first_seen roles.changed])

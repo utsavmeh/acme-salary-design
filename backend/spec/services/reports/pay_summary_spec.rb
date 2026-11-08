@@ -17,12 +17,12 @@ RSpec.describe Reports::PaySummary do
     engineering = group(run, "Engineering")
 
     expect(engineering).to include(headcount: 2, unit: "USD", total: "40.00", average: "20.00", lowest: "10.00", highest: "30.00")
-    expect(engineering[:original_amounts]).to eq([{ currency: "INR", headcount: 2, total_base_pay: "4000.00" }])
+    expect(engineering[:original_amounts]).to eq([ { currency: "INR", headcount: 2, total_base_pay: "4000.00" } ])
     expect(group(run, "Sales")).to include(total: "2000.00")
   end
 
   it "states which rates it used" do
-    expect(run[:rates_used]).to eq([{ currency: "INR", year: 2025, rate_to_usd: "0.01" }])
+    expect(run[:rates_used]).to eq([ { currency: "INR", year: 2025, rate_to_usd: "0.01" } ])
   end
 
   it "groups by country or by nothing" do
@@ -36,7 +36,7 @@ RSpec.describe Reports::PaySummary do
     engineering = group(result, "Engineering")
 
     expect(engineering).to include(headcount: 3, counted: 2, excluded_for_missing_rate: 1, total: "40.00")
-    expect(result[:missing_rates]).to eq([{ currency: "JPY", year: 2025, amounts_affected: 1 }])
+    expect(result[:missing_rates]).to eq([ { currency: "JPY", year: 2025, amounts_affected: 1 } ])
   end
 
   it "does not use another year's rate when the year has none" do
@@ -81,6 +81,6 @@ RSpec.describe Reports::PaySummary do
   end
 
   it "filters by department" do
-    expect(run(department: "Sales")[:groups].map { |g| g[:group] }).to eq(["Sales"])
+    expect(run(department: "Sales")[:groups].map { |g| g[:group] }).to eq([ "Sales" ])
   end
 end

@@ -21,10 +21,10 @@ module Reports
 
       rate = @rate_book.rate_for(currency, year)
       if rate.nil?
-        @missing[[currency, year]] += 1
+        @missing[[ currency, year ]] += 1
         return nil
       end
-      @used[[currency, year]] = rate unless currency == "USD" # USD is always 1; not worth listing
+      @used[[ currency, year ]] = rate unless currency == "USD" # USD is always 1; not worth listing
       amount * rate
     end
 
@@ -42,11 +42,11 @@ module Reports
     def unit(native_currency) = usd? ? "USD" : native_currency
 
     def missing
-      @missing.map { |(currency, year), count| { currency:, year:, amounts_affected: count } }.sort_by { |m| [m[:currency], m[:year]] }
+      @missing.map { |(currency, year), count| { currency:, year:, amounts_affected: count } }.sort_by { |m| [ m[:currency], m[:year] ] }
     end
 
     def rates_used
-      @used.map { |(currency, year), rate| { currency:, year:, rate_to_usd: rate.to_s("F") } }.sort_by { |r| [r[:currency], r[:year]] }
+      @used.map { |(currency, year), rate| { currency:, year:, rate_to_usd: rate.to_s("F") } }.sort_by { |r| [ r[:currency], r[:year] ] }
     end
   end
 end
