@@ -102,3 +102,22 @@ Why a monolith: 10,000 employees is tiny; microservices would add failure modes 
 
 ## 11. Not done yet
 Final review, scale-it-10x discussion, mock interview and failure-injection drill. Run these once you've reviewed this document.
+
+---
+## 12. Implementation notes (what was built, and where it differs from the design above)
+
+Built: sections 1-8 for the backend (Rails API + PostgreSQL) and a React frontend. Differences, all on purpose to keep it simple:
+
+| Design said | Implementation |
+|---|---|
+| Sign-in through the company IdP (OIDC) | Verifies a signed HS256 token with `email` and `groups` claims. Swapping in the IdP's public-key verification is one class (`Auth::TokenVerifier`). |
+| `effective_to` on salary records, partial unique index | No `effective_to`: a record is in force until the next one starts. Corrections are versions of the same date (`unique(employee, effective_from, version)`), so overlaps cannot exist. |
+| Idempotency-Key header | A repeated create for the same employee and date answers 409. Same safety, no key table. |
+| Async export jobs with expiring links | Synchronous CSV (10,000 rows is small). Still audited, and formula-injection safe. |
+| 8 reporting questions | 4 reports cover the agreed questions: pay summary (average/lowest/highest/headcount/total by department, country, title), top paid, hikes, data quality. Distribution bands and per-employee history are served by the employee screens. |
+| Audit entries for salary changes | They record what changed, not the amounts, so auditors cannot read pay through the log. |
+| Second-admin approval, `app_user`, `role_grant` | Removed with the admin role. `role_snapshot` records roles seen at login and audits any change. |
+
+Not built (operations, to do before going live): backups and restore drills, deployment pipeline and monitoring/alerts, rate limiting,
+field-level encryption of pay columns, data retention rules, country scoping of HR users, real IdP connection.
+Brakeman reports no code issues; it notes that Ruby 3.2 and Rails 8.0 are end-of-life, so upgrade before production.
