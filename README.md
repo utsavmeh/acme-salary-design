@@ -26,8 +26,10 @@ the frontend has no automated tests by design.
 - **Excel/CSV migration:** upload, row-by-row validation, rejected-rows report, reconciliation totals, then an all-or-nothing commit.
 - **Search and CSV export** (audited, protected against spreadsheet formula injection).
 - **Audit log:** every view, search, export and change, hash-chained so tampering is detectable. Salary amounts are never copied into it.
-- **Access:** no admin role and no admin portal. Roles come from groups in the company sign-in system:
-  `salary-hr` (salary data, reports, imports), `salary-rate-manager` (exchange rates), `salary-auditor` (audit log).
+- **Access:** username and password sign-in. Three roles: `hr` (salary data, reports, imports), `rate_manager` (exchange rates),
+  `auditor` (audit log). There is no admin role and no admin screen: the people who run the system manage accounts from the command
+  line (below). Accounts are deactivated, never deleted; five wrong passwords lock an account for 15 minutes; a new or reset account
+  gets a one-time password that must be changed at first sign-in; deactivating a user or changing a password ends their sessions at once.
 
 ## Run with Docker (recommended)
 
@@ -39,11 +41,11 @@ Prerequisite: Docker Desktop (or Docker Engine with the Compose plugin), running
    ```
    The first run takes a few minutes (it installs gems and npm packages).
    The backend creates and prepares its database automatically on start.
-2. Create a development sign-in token (valid 12 hours). Roles come from the groups you list:
+2. Create your first user. The one-time password is printed once:
    ```
-   docker compose exec backend bin/rails "auth:dev_token[me@acme.test,salary-hr salary-rate-manager salary-auditor]"
+   docker compose exec -e OPERATOR=$(whoami) backend bin/rails "users:create[your.name,hr rate_manager auditor]"
    ```
-3. Open the app, paste the token on the sign-in page:
+3. Open the app and sign in with that username and one-time password (you will be asked to choose your own password):
    - Frontend: http://localhost:5173
    - Rails health check: http://localhost:3000/up (should return a green page)
    - PostgreSQL from your machine: `localhost:5433`, user `acme_salary`,
@@ -73,6 +75,21 @@ Prerequisites: Ruby 3.2.2, Node 22+, PostgreSQL running locally.
 1. Backend: `cd backend && bundle install && bin/rails db:create db:prepare && bin/rails server`
 2. Frontend (second terminal): `cd frontend && npm install && npm run dev`
 
+## Managing user accounts (operators only)
+
+Run from `backend/` (or with `docker compose exec -e OPERATOR=$(whoami) backend` in front). `OPERATOR` is recorded in the audit log.
+Roles are `hr`, `rate_manager`, `auditor`, separated by spaces.
+
+```
+bin/rails "users:create[asha.rao,hr]"            # prints a one-time password
+bin/rails "users:set_roles[asha.rao,hr auditor]"
+bin/rails "users:reset_password[asha.rao]"       # forgotten password: prints a new one-time password
+bin/rails "users:deactivate[asha.rao]"           # leaves the company; account is kept for the audit trail
+bin/rails "users:activate[asha.rao]"
+bin/rails "users:unlock[asha.rao]"               # clear a lockout early
+bin/rails users:list
+```
+
 ## Run the backend tests
 
 ```
@@ -100,9 +117,8 @@ One row per salary record, header in line 1, `.csv` or `.xlsx`:
 ## Notes and gotchas
 
 - Port 5432 is not used by Docker's database (it uses 5433), so it will not clash with a local PostgreSQL.
-- Signing in: the app verifies a signed token (HS256, secret in `JWT_SECRET`) carrying `email` and `groups`. `JWT_SECRET` is required in
-  production. To use the real company sign-in system (OIDC), replace `Auth::TokenVerifier` with a verifier of that provider's public keys;
-  nothing else changes.
+- Sessions are signed tokens that last 8 hours. In production set `JWT_SECRET` to a long random value (`openssl rand -hex 64`);
+  the app refuses to start without it. Serve the app over HTTPS only.
 - Development and test need no Rails credentials file. For production, the secret key
   must come from the `SECRET_KEY_BASE` environment variable, and database settings
   from `DB_*` / `BACKEND_DATABASE_PASSWORD`. No production deployment setup exists yet.

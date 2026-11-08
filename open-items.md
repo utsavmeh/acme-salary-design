@@ -3,7 +3,7 @@
 Closed by draft decisions (see decisions.md): reporting questions list, rate setter, rate corrections, multi-year rates, frequency, report currency, admin removal.
 
 Still need user confirmation:
-1. CRITICAL: does ACME have a sign-in system (IdP) with MFA and groups? Today the app verifies a shared-secret token; the IdP connection is not built.
+1. MFA: requirements said every user authenticates; passwords alone are weaker for salary data. Recommend adding TOTP (authenticator app) next. Also per-IP login throttling: today only per-account lockout, which an attacker could use to lock out a known username.
 2. Country scoping for HR users (assumed: none)
 3. Department/title available in the Excel files (import requires them)
 4. Retention period and per-country data-residency rules (needs Legal)

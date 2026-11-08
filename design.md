@@ -9,7 +9,7 @@ Design only. Where requirements were unclear I chose the simplest safe option an
 |---|---|
 | Pay frequency | Monthly only, paid at month end. The "pay frequency" field is removed. Migration rejects any row that is not monthly (with a reason). HR fixes it in Excel and re-imports. |
 | Report currency | Two modes. (a) **Native**: allowed only when the result set is one currency (e.g. country = India, shown in INR). (b) **USD**: any scope, using annual rates. No "show in EUR" mode, because that needs cross rates and more rate data. |
-| Admin role and portal | **Removed.** No admin role and no user-management screens. Access comes from groups in ACME's identity provider (IdP): `salary-hr`, `salary-rate-manager`, `salary-auditor`. IT adds and removes people there, using the IdP's own approval workflow. The app records the roles it sees at each login and alerts on any change. |
+| Admin role and portal | **Removed.** No admin role and no user-management screens. The app has its own username/password accounts; operators manage them from the command line (create, set roles, reset password, deactivate, unlock), and every action is audited. |
 | Who sets exchange rates | A separate **Rate Manager** IdP group (`salary-rate-manager`). Not part of the base HR role. |
 | Rate correction vs past reports | Rates are versioned and never overwritten. A correction creates a new version with a mandatory reason. Reports are always computed on the current version. Each exported file carries a stamp with the rate version(s) used, so an old export can be explained and re-run. |
 | Multi-year reports | Each amount is converted at the rate of the calendar year it belongs to (a pay month in 2024 uses the 2024 rate). If any needed year/currency rate is missing, the report shows the affected rows as "rate missing" and gives no USD total for them. |
@@ -110,14 +110,14 @@ Built: sections 1-8 for the backend (Rails API + PostgreSQL) and a React fronten
 
 | Design said | Implementation |
 |---|---|
-| Sign-in through the company IdP (OIDC) | Verifies a signed HS256 token with `email` and `groups` claims. Swapping in the IdP's public-key verification is one class (`Auth::TokenVerifier`). |
+| Sign-in through the company IdP (OIDC) with MFA | Username and password (bcrypt, 12+ characters, lockout after 5 failures, one-time passwords for new/reset accounts). The app issues 8-hour signed tokens that carry only the user id, so deactivation, role changes and password changes apply immediately. **No MFA yet.** |
 | `effective_to` on salary records, partial unique index | No `effective_to`: a record is in force until the next one starts. Corrections are versions of the same date (`unique(employee, effective_from, version)`), so overlaps cannot exist. |
 | Idempotency-Key header | A repeated create for the same employee and date answers 409. Same safety, no key table. |
 | Async export jobs with expiring links | Synchronous CSV (10,000 rows is small). Still audited, and formula-injection safe. |
 | 8 reporting questions | 4 reports cover the agreed questions: pay summary (average/lowest/highest/headcount/total by department, country, title), top paid, hikes, data quality. Distribution bands and per-employee history are served by the employee screens. |
 | Audit entries for salary changes | They record what changed, not the amounts, so auditors cannot read pay through the log. |
-| Second-admin approval, `app_user`, `role_grant` | Removed with the admin role. `role_snapshot` records roles seen at login and audits any change. |
+| Second-admin approval, `app_user`, `role_grant` | Removed with the admin role. `users` holds roles and status; account changes run through `Users::Manager` and are audited as `cli:<operator>`. |
 
 Not built (operations, to do before going live): backups and restore drills, deployment pipeline and monitoring/alerts, rate limiting,
-field-level encryption of pay columns, data retention rules, country scoping of HR users, real IdP connection.
+field-level encryption of pay columns, data retention rules, country scoping of HR users, MFA, per-IP login throttling.
 Brakeman reports no code issues; it notes that Ruby 3.2 and Rails 8.0 are end-of-life, so upgrade before production.

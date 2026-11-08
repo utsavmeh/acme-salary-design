@@ -22,3 +22,8 @@
 20. Native-currency reports allowed only for a single currency; USD otherwise | any target currency | avoids cross rates
 21. Commit of an import is all-or-nothing and needs explicit confirmation when rows were rejected | partial loads | no silent data loss
 22. Tests: RSpec, backend only, real PostgreSQL in transactions | mocks / SQLite | queries and audit lock rely on PostgreSQL; still under 2 seconds
+23. Sign-in = username and password stored in the app (bcrypt) | company IdP / own accounts | user decision; reverses 13 and 18
+24. Accounts managed by command line only (create, roles, reset, deactivate, unlock), all audited as cli:<operator>; no admin role or portal | admin portal / HR manages users / CLI | keeps "no admin portal"; smallest attack surface
+25. Session token holds only the user id plus a password fingerprint; status and roles read from the database each request | roles in token | deactivation, role changes and password changes take effect immediately
+26. New and reset accounts get a one-time password that must be changed before anything else works | user-chosen initial password | operators never know a user's real password
+27. Same login error for every failure, 5 failures lock the account for 15 min, all outcomes audited | detailed errors | does not reveal which usernames exist

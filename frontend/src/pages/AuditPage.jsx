@@ -19,7 +19,7 @@ export default function AuditPage() {
   return (
     <section>
       <form className="toolbar" onSubmit={(e) => { e.preventDefault(); setPage(1); setApplied(filters) }}>
-        <Field label="Person (email)"><input value={filters.actor} onChange={set('actor')} /></Field>
+        <Field label="Person (username)"><input value={filters.actor} onChange={set('actor')} /></Field>
         <Field label="Action"><input value={filters.action_name} onChange={set('action_name')} placeholder="employee.viewed" /></Field>
         <button type="submit">Filter</button>
         <button type="button" onClick={verify}>Verify log integrity</button>

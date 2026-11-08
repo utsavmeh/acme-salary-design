@@ -9,8 +9,12 @@ export class ApiError extends Error {
   constructor(status, body) {
     super(describe(body) || `Request failed (${status})`)
     this.status = status
+    this.code = body?.code
   }
 }
+
+// App registers a function here to send the user back to the sign-in page when a session ends.
+export const sessionHooks = { onExpired: () => {} }
 
 function describe(body) {
   if (!body) return null
@@ -35,6 +39,8 @@ async function send(path, { method = 'GET', json, form } = {}) {
     const text = await response.text()
     let parsed = null
     try { parsed = JSON.parse(text) } catch { /* not JSON */ }
+    // 401 on any call except the sign-in itself means the session expired or the account was switched off.
+    if (response.status === 401 && path !== '/session') sessionHooks.onExpired()
     throw new ApiError(response.status, parsed)
   }
   return response
@@ -46,6 +52,16 @@ const toQuery = (params = {}) => {
 }
 
 export const api = {
+  login: async (username, password) => {
+    const result = await (await send('/session', { method: 'POST', json: { username, password } })).json()
+    setToken(result.token)
+    return result.user
+  },
+  changePassword: async (current_password, new_password) => {
+    const result = await (await send('/me/password', { method: 'PATCH', json: { current_password, new_password } })).json()
+    setToken(result.token)
+    return result.user
+  },
   get: async (path, params) => (await send(path + toQuery(params))).json(),
   post: async (path, json) => (await send(path, { method: 'POST', json: json ?? {} })).json(),
   patch: async (path, json) => (await send(path, { method: 'PATCH', json })).json(),

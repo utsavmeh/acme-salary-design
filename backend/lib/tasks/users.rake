@@ -6,7 +6,8 @@
 #   bin/rails "users:deactivate[asha.rao]"  /  users:activate  /  users:unlock
 #   bin/rails users:list
 namespace :users do
-  manager = -> { Users::Manager.new(operator: ENV.fetch("USER", "unknown")) }
+  # Who is running the command, recorded in the audit log. Set OPERATOR when USER is not available (e.g. in Docker).
+  manager = -> { Users::Manager.new(operator: ENV.fetch("OPERATOR") { ENV.fetch("USER", "unknown") }) }
 
   # Prints a clear message instead of a stack trace for expected problems.
   run = lambda do |&block|
