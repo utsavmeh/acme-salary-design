@@ -35,6 +35,11 @@ class SalaryRecord < ApplicationRecord
     SQL
   }
 
+  # { employee_id => record } for the employees' records in force on `date`.
+  def self.current_by_employee(employee_ids, date = Date.current)
+    current_as_of(date).where(employee_id: employee_ids).includes(:deduction_lines).index_by(&:employee_id)
+  end
+
   def readonly? = persisted? || super
 
   def deductions_total

@@ -52,7 +52,5 @@ class EmployeesController < ApplicationController
     employees.map { |e| EmployeePresenter.call(e, current_salary: salaries[e.id]) }
   end
 
-  def current_salaries_for(ids)
-    SalaryRecord.current_as_of(Date.current).where(employee_id: ids).includes(:deduction_lines).index_by(&:employee_id)
-  end
+  def current_salaries_for(ids) = SalaryRecord.current_by_employee(ids)
 end
