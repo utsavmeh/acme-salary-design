@@ -10,7 +10,7 @@ Design only. Where requirements were unclear I chose the simplest safe option an
 | Pay frequency | Monthly only, paid at month end. The "pay frequency" field is removed. Migration rejects any row that is not monthly (with a reason). HR fixes it in Excel and re-imports. |
 | Report currency | Two modes. (a) **Native**: allowed only when the result set is one currency (e.g. country = India, shown in INR). (b) **USD**: any scope, using annual rates. No "show in EUR" mode, because that needs cross rates and more rate data. |
 | Admin role and portal | **Removed.** No admin role and no user-management screens. The app has its own username/password accounts; operators manage them from the command line (create, set roles, reset password, deactivate, unlock), and every action is audited. |
-| Who sets exchange rates | A separate **Rate Manager** IdP group (`salary-rate-manager`). Not part of the base HR role. |
+| Who sets exchange rates | A separate **rate_manager** role. Not part of the base HR role. |
 | Rate correction vs past reports | Rates are versioned and never overwritten. A correction creates a new version with a mandatory reason. Reports are always computed on the current version. Each exported file carries a stamp with the rate version(s) used, so an old export can be explained and re-run. |
 | Multi-year reports | Each amount is converted at the rate of the calendar year it belongs to (a pay month in 2024 uses the 2024 rate). If any needed year/currency rate is missing, the report shows the affected rows as "rate missing" and gives no USD total for them. |
 | Department / role | Added as an effective-dated assignment (employee, department, job title, effective_from). Reports use the assignment in force at the report's as-of date. |
@@ -38,8 +38,7 @@ Design only. Where requirements were unclear I chose the simplest safe option an
 - **salary_record**: id, employee_id, currency, base_pay, gross, net, country, effective_from, effective_to (nullable), created_by, created_at, supersedes_id. Records are never updated or deleted. A correction creates a new row that supersedes the old one.
 - **deduction_line**: salary_record_id, label, amount. Rule enforced at write: gross - sum(deductions) = net, exactly.
 - **exchange_rate**: id, currency, year, rate_to_usd, version, reason, set_by, set_at. New version per change; the latest version wins.
-- **app_user**: id, email, last_seen_at. Created automatically at first login, never deleted. Whether a person is active is decided by the IdP, not by a field here.
-- **role_snapshot**: user_id, roles seen in the IdP token, seen_at. A new row is written only when the roles differ from the previous login (this is how role changes are audited and alerted).
+- **user**: username, password_digest (bcrypt), roles (hr / rate_manager / auditor), status (active / deactivated), must_change_password, failed_attempts, locked_until. Never deleted.
 - **audit_event**: id, time, actor, action (view/search/export/create/change/grant/rate), target type and id, filter or parameters used, result count, source IP. Append-only, each row carries a hash of the previous row (tamper evidence).
 - **import_batch / import_row**: batch id, file hash, row number, raw content, status (accepted/rejected), rejection reason.
 - **export_job**: id, requested_by, report definition, row count, rate version stamp, file location, expires_at.
@@ -56,10 +55,10 @@ Constraints: only one open (effective_to null) salary record per employee; no ov
 - `GET/POST /exchange-rates`, `GET /exchange-rates/history` (Rate Manager to write)
 - `POST /imports` (upload), `GET /imports/{id}/rejected-rows`, `GET /imports/{id}/reconciliation`, `POST /imports/{id}/commit`
 - `GET /me` (current user and roles). There are no user-management endpoints.
-- `GET /audit` (viewable only by the `salary-auditor` group, not by plain HR, since the log itself reveals who looked at whom)
+- `GET /audit` (viewable only by the `auditor` role, not by plain HR, since the log itself reveals who looked at whom)
 
 ## 6. High-level architecture
-Browser SPA -> HTTPS load balancer/WAF -> stateless app server (modular monolith: users, salary, rates, reports, import, audit modules) -> PostgreSQL (primary + hot standby). Object storage holds uploaded Excel files and export files (encrypted). Sign-in goes through ACME's identity provider (SSO with MFA); the app reads the user's group claims from the token and maps them to roles. No passwords are stored by the app. A background worker (same codebase) runs imports and exports.
+Browser SPA -> HTTPS load balancer/WAF -> stateless app server (modular monolith: users, salary, rates, reports, import, audit modules) -> PostgreSQL (primary + hot standby). Object storage holds uploaded Excel files and export files (encrypted). Users sign in with username and password; the app issues a signed session token. A background worker (same codebase) runs imports and exports.
 
 Why a monolith: 10,000 employees is tiny; microservices would add failure modes without benefit.
 
@@ -79,9 +78,10 @@ Why a monolith: 10,000 employees is tiny; microservices would add failure modes 
 - Rate corrected after a report was exported: old export keeps its stamp; the new run uses the new version; the diff is explainable from the rate history.
 - Employee moves country/currency: new salary record with the new currency; history stays in the old one.
 - Bad Excel data: rejected with reason; never partially loaded.
-- Someone at IT adds themselves (or a friend) to a salary group: the app cannot block it, but the next login writes a role_snapshot row and fires an alert to security and the HR head. The IdP's own change log and approval workflow are the primary control.
-- Departing HR user: removed from the IdP group (or disabled in the IdP); access ends at the next token refresh (minutes); audit history stays.
-- IdP outage: nobody can sign in. Already-signed-in sessions end at token expiry. Accepted, because salary access is not time-critical.
+- An operator gives themselves or someone else a salary role: the app cannot stop someone with server access, but the change is audited as `cli:<operator>`; review the audit log for `user.*` events regularly.
+- Departing HR user: `users:deactivate`; their sessions stop working on the next request; audit history stays.
+- Forgotten password: an operator runs `users:reset_password`; the user must choose a new one at next sign-in.
+- Password guessing: 5 failures lock the account for 15 minutes; every attempt is audited.
 - Stolen session / abuse: short sessions, MFA, rate limits, alert on unusual export volume or after-hours bulk viewing.
 - Database or app server down: standby takes over; the app shows a clear outage page; no writes are accepted while the primary is unavailable (consistency over availability).
 - Export worker crashes: job is retried; output is written to a temp name and renamed only when complete.
@@ -96,7 +96,7 @@ Why a monolith: 10,000 employees is tiny; microservices would add failure modes 
 ## 10. Assumptions I made (please confirm or overrule)
 1. All HR managers can see all countries (no country scoping). Easy to add later via a country filter on roles.
 2. A salary record holds monthly figures (gross, deductions, net) per effective period, not a separate payslip for every month.
-3. **Now critical:** ACME has a company identity provider with MFA and groups, and IT will manage the three salary groups there with an approval step. Without it, this simplification does not work.
+3. Operators exist who will run the account commands, and at least two people can do so (no single point of failure). MFA is not built and should be added.
 4. Department and job title exist in the Excel files or can be supplied.
 5. Retention period and any data-residency law per country are not yet known; Legal must answer.
 
