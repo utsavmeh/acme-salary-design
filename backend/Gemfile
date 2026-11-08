@@ -21,8 +21,10 @@ gem "bootsnap", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
-# Verifies the signed identity token issued by the company sign-in system
+# Signs and verifies the session token the app issues at login
 gem "jwt", "~> 2.9"
+# Password hashing for has_secure_password
+gem "bcrypt", "~> 3.1"
 # json 3.x is not yet compatible with this Rails version
 gem "json", "~> 2.9"
 # Reads .xlsx files for the one-time Excel migration

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_08_100006) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_100007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,7 +101,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100006) do
     t.string "email", null: false
     t.string "roles", default: [], null: false, array: true
     t.datetime "seen_at", null: false
-    t.index ["email", "seen_at"], name: "index_role_snapshots_on_email_and_seen_at"
   end
 
   create_table "salary_records", force: :cascade do |t|
@@ -120,6 +119,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100006) do
     t.index ["employee_id", "effective_from", "version"], name: "idx_on_employee_id_effective_from_version_9bb800c71b", unique: true
     t.index ["employee_id"], name: "index_salary_records_on_employee_id"
     t.index ["import_batch_id"], name: "index_salary_records_on_import_batch_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username", null: false
+    t.string "password_digest", null: false
+    t.string "roles", default: [], null: false, array: true
+    t.string "status", default: "active", null: false
+    t.boolean "must_change_password", default: true, null: false
+    t.integer "failed_attempts", default: 0, null: false
+    t.datetime "locked_until"
+    t.datetime "last_login_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "assignments", "employees"
