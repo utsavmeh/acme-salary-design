@@ -88,7 +88,7 @@ RSpec.describe "Employees API" do
     it "answers 422 with the reasons for invalid data and does not audit it" do
       post "/api/employees", params: { employee: valid_params[:employee].merge(country: "india") }, headers: hr_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body["details"]).to have_key("country")
       expect(AuditEvent.where(action: "employee.created")).to be_empty
     end
@@ -117,7 +117,7 @@ RSpec.describe "Employees API" do
     it "answers 422 when an assignment already starts that day" do
       create(:assignment, employee:, effective_from: Date.new(2024, 1, 1))
       post "/api/employees/#{employee.id}/assignments", params:, headers: hr_headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

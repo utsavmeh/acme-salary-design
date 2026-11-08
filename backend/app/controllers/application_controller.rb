@@ -4,11 +4,11 @@ class ApplicationController < ActionController::API
   rescue_from AppErrors::Unauthorized do |e| render_error(:unauthorized, e.message) end
   rescue_from AppErrors::Forbidden do |e| render_error(:forbidden, e.message) end
   rescue_from AppErrors::Conflict do |e| render_error(:conflict, e.message) end
-  rescue_from AppErrors::BadRequest do |e| render_error(:unprocessable_entity, e.message) end
+  rescue_from AppErrors::BadRequest do |e| render_error(:unprocessable_content, e.message) end
   rescue_from ActiveRecord::RecordNotFound do |e| render_error(:not_found, e.message) end
   rescue_from ActionController::ParameterMissing do |e| render_error(:bad_request, e.message) end
   rescue_from ActiveRecord::RecordInvalid do |e|
-    render json: { error: "Validation failed", details: e.record.errors.to_hash }, status: :unprocessable_entity
+    render json: { error: "Validation failed", details: e.record.errors.to_hash }, status: :unprocessable_content
   end
 
   private

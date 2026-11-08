@@ -6,6 +6,8 @@ Rails.application.routes.draw do
 
     resources :employees, only: %i[index show create update] do
       resources :assignments, only: :create
+      resources :salary_records, only: %i[index create]
     end
+    post "salary_records/:id/correct", to: "salary_records#correct"
   end
 end
