@@ -3,5 +3,9 @@ Rails.application.routes.draw do
 
   scope "/api" do
     get "me", to: "me#show"
+
+    resources :employees, only: %i[index show create update] do
+      resources :assignments, only: :create
+    end
   end
 end
