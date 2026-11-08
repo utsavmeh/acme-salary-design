@@ -11,7 +11,7 @@ RSpec.describe "Audit events API" do
 
     expect(response).to have_http_status(:ok)
     actions = response.parsed_body["data"].map { |e| e["action"] }
-    expect(actions).to eq(%w[roles.first_seen report.viewed employee.viewed])
+    expect(actions).to eq(%w[report.viewed employee.viewed])
   end
 
   it "is forbidden for HR managers and rate managers" do

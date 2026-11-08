@@ -2,7 +2,9 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   scope "/api" do
+    post "session", to: "sessions#create"
     get "me", to: "me#show"
+    patch "me/password", to: "passwords#update"
     resources :exchange_rates, only: %i[index create]
     get "reports/:name", to: "reports#show"
     resources :imports, only: %i[index create show] do

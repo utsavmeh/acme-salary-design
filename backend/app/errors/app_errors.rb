@@ -3,6 +3,7 @@ module AppErrors
   class Base < StandardError; end
   class Unauthorized < Base; end # 401: no or bad identity token
   class Forbidden < Base; end    # 403: signed in, but the role does not allow this
+  class PasswordChangeRequired < Forbidden; end # 403: must set a new password before anything else
   class Conflict < Base; end     # 409: a concurrent or repeated write got there first
   class BadRequest < Base; end   # 422: the request cannot be answered as asked
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_08_100007) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_08_100008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -95,12 +95,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_08_100007) do
     t.string "reasons", default: [], null: false, array: true
     t.index ["import_batch_id", "row_number"], name: "index_import_rows_on_import_batch_id_and_row_number", unique: true
     t.index ["import_batch_id"], name: "index_import_rows_on_import_batch_id"
-  end
-
-  create_table "role_snapshots", force: :cascade do |t|
-    t.string "email", null: false
-    t.string "roles", default: [], null: false, array: true
-    t.datetime "seen_at", null: false
   end
 
   create_table "salary_records", force: :cascade do |t|

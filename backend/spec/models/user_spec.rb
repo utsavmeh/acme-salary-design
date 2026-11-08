@@ -45,11 +45,11 @@ RSpec.describe User do
     end
 
     it "rejects an unknown role (there is no admin role)" do
-      expect(build(:user, roles: ["admin"])).not_to be_valid
+      expect(build(:user, roles: [ "admin" ])).not_to be_valid
     end
 
     it "answers has_any_role? with symbols or strings" do
-      user = build(:user, roles: ["hr"])
+      user = build(:user, roles: [ "hr" ])
       expect(user.has_any_role?(:hr, :auditor)).to be(true)
       expect(user.has_any_role?(:auditor)).to be(false)
     end

@@ -12,7 +12,7 @@ RSpec.describe "Employees API" do
     end
 
     it "answers 403 to a user with no salary role" do
-      get "/api/employees", headers: auth_headers(groups: [ "some-other-group" ])
+      get "/api/employees", headers: no_role_headers
       expect(response).to have_http_status(:forbidden)
     end
 

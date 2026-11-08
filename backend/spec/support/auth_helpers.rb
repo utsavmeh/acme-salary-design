@@ -1,16 +1,15 @@
-# Builds the Authorization header the real sign-in system would send.
+# Signed-in users for request specs: each helper returns the Authorization header for a real user record.
 module AuthHelpers
-  def token_for(email: "hr@acme.test", groups: [ "salary-hr" ], exp: 1.hour.from_now.to_i, secret: Rails.configuration.x.auth.jwt_secret)
-    JWT.encode({ email:, groups:, exp: }, secret, Auth::TokenVerifier::ALGORITHM)
+  def user_with(username, roles)
+    User.find_by(username:) || create(:user, username:, roles:)
   end
 
-  def auth_headers(**options)
-    { "Authorization" => "Bearer #{token_for(**options)}" }
-  end
+  def headers_for(user) = { "Authorization" => "Bearer #{Auth::Tokens.issue(user)}" }
 
-  def hr_headers = auth_headers(email: "hr@acme.test", groups: [ "salary-hr" ])
-  def rate_manager_headers = auth_headers(email: "rates@acme.test", groups: [ "salary-rate-manager" ])
-  def auditor_headers = auth_headers(email: "auditor@acme.test", groups: [ "salary-auditor" ])
+  def hr_headers = headers_for(user_with("hr@acme.test", [ "hr" ]))
+  def rate_manager_headers = headers_for(user_with("rates@acme.test", [ "rate_manager" ]))
+  def auditor_headers = headers_for(user_with("auditor@acme.test", [ "auditor" ]))
+  def no_role_headers = headers_for(user_with("nobody@acme.test", []))
 end
 
 RSpec.configure { |config| config.include AuthHelpers }

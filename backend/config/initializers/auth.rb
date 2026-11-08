@@ -1,6 +1,5 @@
-# The company sign-in system issues a signed token (JWT) with the user's email and groups.
-# This app only verifies it; it stores no passwords. In production JWT_SECRET must be set
-# to the key shared with the sign-in system.
+# The app signs the session tokens it hands out at login. In production JWT_SECRET must be set
+# to a long random value (for example `openssl rand -hex 64`); never reuse the development one.
 Rails.configuration.x.auth.jwt_secret =
   ENV.fetch("JWT_SECRET") do
     raise "JWT_SECRET must be set in production" if Rails.env.production?
