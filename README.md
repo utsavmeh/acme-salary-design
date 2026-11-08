@@ -90,6 +90,21 @@ bin/rails "users:unlock[asha.rao]"               # clear a lockout early
 bin/rails users:list
 ```
 
+## Dummy data for trying the app
+
+```
+docker compose exec backend bin/rails "seed:demo[10000]"     # or without Docker: cd backend && bin/rails "seed:demo[10000]"
+```
+Creates made-up employees in 10 countries and 9 departments, each with department/job-title history, a monthly salary history
+(yearly raises and some promotions), deductions, and exchange rates for every currency and year, in about 8 seconds. It refuses to run
+in production or when employees already exist (to start over: `bin/rails db:schema:load`, which also removes users).
+`SEED=7` gives a different data set; the same `SEED` always gives the same data. About 5 active employees get no salary record on
+purpose, so the data-quality report has something to show. To clear only the demo data and keep your users, see the SQL below.
+
+```
+docker compose exec backend bin/rails runner 'ActiveRecord::Base.connection.execute("TRUNCATE deduction_lines, salary_records, assignments, employees, exchange_rates RESTART IDENTITY CASCADE")'
+```
+
 ## Run the backend tests
 
 ```
