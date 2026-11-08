@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   scope "/api" do
     get "me", to: "me#show"
     resources :exchange_rates, only: %i[index create]
+    get "reports/:name", to: "reports#show"
 
     resources :employees, only: %i[index show create update] do
       resources :assignments, only: :create
