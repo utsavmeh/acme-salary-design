@@ -22,7 +22,7 @@ gem "bootsnap", require: false
 gem "thruster", require: false
 
 # Signs and verifies the session token the app issues at login
-gem "jwt", "~> 2.9"
+gem "jwt", "~> 3.3"
 # Password hashing for has_secure_password
 gem "bcrypt", "~> 3.1"
 # json 3.x is not yet compatible with this Rails version
