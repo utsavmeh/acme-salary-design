@@ -58,6 +58,8 @@ Constraints: only one open (effective_to null) salary record per employee; no ov
 - `GET /audit` (viewable only by the `auditor` role, not by plain HR, since the log itself reveals who looked at whom)
 
 ## 6. High-level architecture
+
+Diagrams (containers, backend components, Excel import flow, data model): see [docs/architecture.md](docs/architecture.md).
 Browser SPA -> HTTPS load balancer/WAF -> stateless app server (modular monolith: users, salary, rates, reports, import, audit modules) -> PostgreSQL (primary + hot standby). Object storage holds uploaded Excel files and export files (encrypted). Users sign in with username and password; the app issues a signed session token. A background worker (same codebase) runs imports and exports.
 
 Why a monolith: 10,000 employees is tiny; microservices would add failure modes without benefit.
