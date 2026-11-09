@@ -106,6 +106,11 @@ purpose, so the data-quality report has something to show. To clear only the dem
 docker compose exec backend bin/rails runner 'ActiveRecord::Base.connection.execute("TRUNCATE deduction_lines, salary_records, assignments, employees, exchange_rates RESTART IDENTITY CASCADE")'
 ```
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request: RuboCop, Brakeman, the RSpec suite against a PostgreSQL service, and the frontend lint and build.
+Brakeman runs with `--no-exit-on-warn`, so the Ruby 3.2 and Rails 8.0 end-of-life notices are printed but do not fail the build.
+
 ## Run the backend tests
 
 ```
