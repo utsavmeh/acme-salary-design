@@ -4,7 +4,7 @@ Web application for HR managers to manage salary data for ACME's 10,000 employee
 Stack: Ruby on Rails (API) + React (Vite) + PostgreSQL.
 
 Design docs: `requirements.md`, `design.md`, `decisions.md`, `open-items.md`, `progress.md`.
-Architecture diagrams: [docs/architecture.md](docs/architecture.md).
+Architecture diagrams: [docs/architecture.md](docs/architecture.md). Performance notes and measurements: [docs/performance.md](docs/performance.md).
 Status: backend and frontend implemented. Backend has an RSpec suite (about 200 examples, under 2 seconds);
 the frontend has no automated tests by design.
 
