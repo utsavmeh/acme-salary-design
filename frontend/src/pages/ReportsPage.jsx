@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { api } from '../api'
 import { ErrorBox, Field, Notice, Table } from '../components/ui'
 
+const THIS_YEAR = new Date().getFullYear()
+
 const REPORTS = {
   pay_summary: { label: 'Pay summary (headcount, average, lowest, highest)', params: ['group_by', 'department', 'country', 'job_title', 'as_of'] },
   top_paid: { label: 'Highest paid employees', params: ['department', 'country', 'limit', 'as_of'] },
@@ -38,7 +40,7 @@ const COLUMNS = {
 
 export default function ReportsPage() {
   const [name, setName] = useState('pay_summary')
-  const [params, setParams] = useState({ currency_mode: 'usd', group_by: 'department', year: new Date().getFullYear() })
+  const [params, setParams] = useState({ currency_mode: 'usd', group_by: 'department', year: THIS_YEAR })
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const set = (key) => (e) => setParams({ ...params, [key]: e.target.value })

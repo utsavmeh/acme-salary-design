@@ -3,6 +3,8 @@ import { api } from '../api'
 import { ErrorBox, Field, Table } from '../components/ui'
 import { useLoad } from '../hooks'
 
+const THIS_YEAR = new Date().getFullYear()
+
 export default function RatesPage({ me }) {
   const [history, setHistory] = useState(false)
   const rates = useLoad(() => api.get('/exchange_rates', { all_versions: history }), [history])
@@ -28,7 +30,7 @@ export default function RatesPage({ me }) {
 }
 
 function RateForm({ onSaved }) {
-  const blank = { currency: '', year: new Date().getFullYear(), rate_to_usd: '', reason: '' }
+  const blank = { currency: '', year: THIS_YEAR, rate_to_usd: '', reason: '' }
   const [form, setForm] = useState(blank)
   const [error, setError] = useState(null)
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value })
