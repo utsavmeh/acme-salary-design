@@ -5,9 +5,11 @@ on:
   push:
     branches: [ main ]
 
+# Runners are pinned to ubuntu-24.04: setup-ruby has no prebuilt Ruby 3.2.2 for newer Ubuntu releases.
+# Moving to a supported Ruby (3.2 is end-of-life) would let this go back to ubuntu-latest.
 jobs:
   backend-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: backend
@@ -26,7 +28,7 @@ jobs:
         run: bin/rubocop -f github
 
   backend-security:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: backend
@@ -47,7 +49,7 @@ jobs:
         run: bin/brakeman --no-pager --no-exit-on-warn
 
   backend-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: backend
@@ -63,11 +65,11 @@ jobs:
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config
-
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -93,7 +95,7 @@ jobs:
         run: bundle exec rspec
 
   frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
