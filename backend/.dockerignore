@@ -5,3 +5,9 @@ tmp/*
 vendor/bundle
 storage
 *.log
+Dockerfile.dev
+railway.json
+spec
+coverage
+README.md
+.rubocop.yml

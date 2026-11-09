@@ -1,4 +1,5 @@
-# Fills the database with dummy data for trying the app out. Development/test only.
+# Fills the database with dummy data for trying the app out. Development and test only, unless
+# ALLOW_DEMO_SEED=yes is set (for a demo deployment that holds no real salaries).
 #
 #   bin/rails "seed:demo[10000]"      employees to create (default 10000)
 #   SEED=7 bin/rails seed:demo        a different (but still repeatable) random data set
@@ -8,7 +9,7 @@
 namespace :seed do
   desc "Create dummy employees, department history, salary history, deductions and exchange rates"
   task :demo, %i[count] => :environment do |_t, args|
-    abort "Refusing to load dummy data in production" if Rails.env.production?
+    abort "Refusing to load dummy data in production (set ALLOW_DEMO_SEED=yes to override on a demo deployment)" if Rails.env.production? && ENV["ALLOW_DEMO_SEED"] != "yes"
     abort "Employees already exist. To start over run: bin/rails db:schema:load" if Employee.exists?
 
     count = Integer(args[:count] || 10_000)
