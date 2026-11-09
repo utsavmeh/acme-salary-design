@@ -28,7 +28,7 @@ gem "bcrypt", "~> 3.1"
 # json 3.x is not yet compatible with this Rails version
 gem "json", "~> 2.9"
 # Reads .xlsx files for the one-time Excel migration
-gem "roo", "~> 2.10"
+gem "roo", "~> 3.0"
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
